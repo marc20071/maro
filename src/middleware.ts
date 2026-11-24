@@ -36,16 +36,15 @@ export async function middleware(request: NextRequest) {
             options?: Parameters<typeof response.cookies.set>[2];
           }[]
         ) {
-          // Update request cookies so the current middleware
-          // and downstream server components receive fresh values.
+          // Update request cookies.
           list.forEach(({ name, value }) => {
             request.cookies.set(name, value);
           });
 
-          // Recreate the response with the updated request.
+          // Recreate response with updated request cookies.
           response = NextResponse.next({ request });
 
-          // Persist refreshed cookies in the browser response.
+          // Persist refreshed cookies in the browser.
           list.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options);
           });
@@ -54,21 +53,20 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Validate the session with Supabase.
+  // Verify the current Supabase session.
   const {
     data: { user },
-    error,
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
 
-  // Check whether the requested route is publicly accessible.
+  // Determine whether this route is public.
   const isPublic = PUBLIC.some(
     (publicPath) =>
       path === publicPath || path.startsWith(publicPath + "/")
   );
 
-  // Protect private pages and API endpoints.
+  // Redirect unauthenticated visitors from protected routes.
   if (!user && !isPublic) {
     if (path.startsWith("/api/")) {
       return NextResponse.json(
@@ -84,7 +82,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from the login page.
+  // Redirect authenticated users away from login.
   if (user && path === "/login") {
     const url = request.nextUrl.clone();
     url.pathname = "/";
@@ -92,11 +90,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Preserve the response containing refreshed authentication cookies.
   return response;
 }
 
 export const config = {
+  runtime: "nodejs",
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|svg|jpg|ico|webp)$).*)",
   ],
