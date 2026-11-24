@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'highlight.js/styles/github-dark.css';
+
+:root { color-scheme: dark; }
+html, body { height: 100%; background: #0B0E13; color: #E8E6E1; overflow-x: hidden; }
+body { font-family: var(--font-sans), system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+:focus-visible { outline: 2px solid #F5A524; outline-offset: 2px; }
+.btn { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50; }
+.btn-primary { @apply bg-saffron text-ink-950 hover:bg-[#ffb83d]; }
+.btn-ghost { @apply border border-ink-600 text-paper hover:bg-ink-700; }
+.input { @apply w-full rounded-xl border border-ink-600 bg-ink-900 px-3 py-3 text-sm text-paper placeholder:text-mute focus:border-saffron focus:outline-none; }
+.prose-maro { @apply text-[15px] leading-7; overflow-wrap: anywhere; }
+.prose-maro p { @apply my-3; }
+.prose-maro ul { @apply my-3 list-disc pl-6; }
+.prose-maro ol { @apply my-3 list-decimal pl-6; }
+.prose-maro h1, .prose-maro h2, .prose-maro h3 { @apply mt-5 mb-2 font-semibold; }
+.prose-maro h2 { @apply text-lg; }
+.prose-maro a { @apply text-saffron underline; }
+.prose-maro :not(pre) > code { @apply rounded bg-ink-700 px-1.5 py-0.5 font-mono text-[13px]; }
+.prose-maro table { @apply my-3 block max-w-full overflow-x-auto text-sm; }
+.prose-maro th, .prose-maro td { @apply border border-ink-600 px-3 py-1.5; }
+.prose-maro pre { @apply m-0 overflow-x-auto p-4 text-[13px] leading-6; }
+.prose-maro pre code { font-family: var(--font-mono), monospace; background: transparent; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
