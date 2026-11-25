@@ -1,6 +1,5 @@
 
 import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
 import { Bricolage_Grotesque, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import ServiceWorker from '@/components/ServiceWorker';
@@ -74,14 +73,13 @@ export default function RootLayout({
           name="monetag"
           content="c8e74ae6ead447a698702cc796eec418"
         />
-        {/* Google Search Console verification */}
-  <meta
-    name="google-site-verification"
-    content="qYPvRFyHCkzwqItYAul-sPsUPP3Ino476Er0fhX7hks"
-  />
 
-        {/* Monetag advertising integration */}
-        
+        {/* Google Search Console verification */}
+        <meta
+          name="google-site-verification"
+          content="qYPvRFyHCkzwqItYAul-sPsUPP3Ino476Er0fhX7hks"
+        />
+      </head>
 
       <body>
         {children}
