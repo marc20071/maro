@@ -1,3 +1,448 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0B0E13"><title>Offline · MARO AI</title>
-<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0B0E13;color:#E8E6E1;font-family:system-ui,sans-serif;text-align:center;padding:24px}img{width:72px;height:72px;border-radius:22%}h1{font-size:1.5rem;margin:16px 0 8px}p{color:#8C93A3;max-width:32ch;margin:0 auto 20px}button{background:#F5A524;color:#0B0E13;border:0;border-radius:12px;padding:12px 20px;font-size:1rem;font-weight:600;min-height:44px}</style></head>
-<body><main><img src="/icons/maro.svg" alt=""><h1>You’re offline</h1><p>MARO AI needs a connection to answer questions. Reconnect and try again.</p><button onclick="location.reload()">Try again</button></main></body></html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0B0E13">
+  <meta name="description" content="MARO AI is reconnecting.">
+  <title>Reconnecting · MARO AI</title>
+
+  <style>
+    :root {
+      --bg: #0B0E13;
+      --surface: #141923;
+      --text: #F4F4F5;
+      --muted: #8C93A3;
+      --accent: #F5A524;
+      --border: rgba(255,255,255,0.07);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow: hidden;
+      background:
+        radial-gradient(
+          ellipse at 50% 35%,
+          rgba(245,165,36,0.08),
+          transparent 45%
+        ),
+        var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      animation: fadeIn 0.7s ease-out both;
+    }
+
+    .logo-wrapper {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 28px;
+      display: grid;
+      place-items: center;
+    }
+
+    .logo-glow {
+      position: absolute;
+      inset: -14px;
+      border-radius: 32px;
+      background: rgba(245,165,36,0.10);
+      filter: blur(24px);
+      animation: glow 2.8s ease-in-out infinite;
+    }
+
+    .logo {
+      position: relative;
+      width: 82px;
+      height: 82px;
+      object-fit: contain;
+      border-radius: 23px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .brand {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 5px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(25px, 7vw, 32px);
+      line-height: 1.2;
+      letter-spacing: -0.8px;
+      margin: 0 0 12px;
+      font-weight: 750;
+    }
+
+    .description {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 330px;
+      margin: 0 auto;
+    }
+
+    .status-card {
+      margin-top: 32px;
+      padding: 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .status.online .status-dot {
+      background: #39C98A;
+      animation: none;
+    }
+
+    .status.error .status-dot {
+      background: #F06464;
+      animation: none;
+    }
+
+    .progress {
+      height: 3px;
+      margin-top: 18px;
+      border-radius: 99px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 35%;
+      border-radius: 99px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        var(--accent),
+        #FFD27A
+      );
+      animation: loading 1.6s ease-in-out infinite;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      min-height: 50px;
+      padding: 14px 20px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--accent);
+      color: #0B0E13;
+      font-size: 15px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    .footer {
+      margin-top: 28px;
+      color: #555D6B;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+    }
+
+    @keyframes loading {
+      0% {
+        transform: translateX(-120%);
+      }
+      50% {
+        transform: translateX(110%);
+      }
+      100% {
+        transform: translateX(300%);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 0.4;
+        transform: scale(0.85);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.15);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    @keyframes glow {
+      0%, 100% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 400px) {
+      .logo-wrapper {
+        width: 82px;
+        height: 82px;
+      }
+
+      .logo {
+        width: 72px;
+        height: 72px;
+      }
+
+      .status-card {
+        padding: 16px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <div class="logo-wrapper">
+      <div class="logo-glow"></div>
+      <img
+        class="logo"
+        src="/icons/maro.svg"
+        alt="MARO AI"
+      >
+    </div>
+
+    <div class="brand">MARO AI</div>
+
+    <h1 id="title">We're reconnecting</h1>
+
+    <p class="description" id="description">
+      MARO is waking up. Please wait a moment while we reconnect
+      you to your AI assistant.
+    </p>
+
+    <div class="status-card">
+
+      <div class="status" id="status">
+        <span class="status-dot"></span>
+        <span id="status-text">Establishing connection...</span>
+      </div>
+
+      <div class="progress">
+        <div class="progress-bar" id="progress"></div>
+      </div>
+
+    </div>
+
+    <button id="retry" onclick="retryConnection()">
+      Try Again
+    </button>
+
+    <div class="footer">
+      Your AI companion · Always ready to help
+    </div>
+
+  </main>
+
+  <script>
+    const title = document.getElementById("title");
+    const description = document.getElementById("description");
+    const status = document.getElementById("status");
+    const statusText = document.getElementById("status-text");
+    const retryButton = document.getElementById("retry");
+    const progress = document.getElementById("progress");
+
+    let checking = false;
+    let retryTimer = null;
+
+    function setStatus(message, type = "") {
+      status.className = "status " + type;
+      statusText.textContent = message;
+    }
+
+    async function retryConnection() {
+      if (checking) return;
+
+      checking = true;
+
+      retryButton.disabled = true;
+      retryButton.textContent = "Connecting...";
+      title.textContent = "Connecting to MARO";
+      description.textContent =
+        "We're checking your connection and bringing MARO back online.";
+
+      setStatus("Checking connection...", "");
+      progress.style.animationPlayState = "running";
+
+      try {
+        const controller = new AbortController();
+
+        const timeout = setTimeout(
+          () => controller.abort(),
+          8000
+        );
+
+        const response = await fetch("/", {
+          method: "GET",
+          cache: "no-store",
+          credentials: "same-origin",
+          signal: controller.signal
+        });
+
+        clearTimeout(timeout);
+
+        if (response.ok) {
+          const contentType =
+            response.headers.get("content-type") || "";
+
+          if (contentType.includes("text/html")) {
+            const html = await response.text();
+
+            // The service worker may return this offline page
+            // as a fallback. Do not reload into the same page.
+            const isOfflineFallback =
+              html.includes("We're reconnecting") ||
+              html.includes("You’re offline") ||
+              html.includes("You\u2019re offline");
+
+            if (!isOfflineFallback) {
+              setStatus("Connection restored!", "online");
+
+              title.textContent = "You're back!";
+              description.textContent =
+                "MARO is ready. Opening your AI assistant...";
+
+              retryButton.textContent = "Connected!";
+              retryButton.disabled = true;
+
+              setTimeout(() => {
+                window.location.reload();
+              }, 700);
+
+              return;
+            }
+          }
+        }
+
+        throw new Error("Server not ready");
+
+      } catch (error) {
+        title.textContent = "We're reconnecting";
+
+        description.textContent =
+          "MARO is temporarily unavailable. We'll automatically try again.";
+
+        setStatus("Waiting for connection...", "error");
+
+        retryButton.textContent = "Try Again";
+        retryButton.disabled = false;
+
+      } finally {
+        checking = false;
+
+        if (retryTimer) {
+          clearTimeout(retryTimer);
+        }
+
+        retryTimer = setTimeout(
+          retryConnection,
+          10000
+        );
+      }
+    }
+
+    // First automatic attempt after 3 seconds.
+    setTimeout(retryConnection, 3000);
+
+    // Allow the button to retry immediately.
+    retryButton.addEventListener("click", () => {
+      if (retryTimer) {
+        clearTimeout(retryTimer);
+      }
+    });
+
+    // Retry when the device regains internet connectivity.
+    window.addEventListener("online", () => {
+      if (retryTimer) {
+        clearTimeout(retryTimer);
+      }
+
+      retryConnection();
+    });
+  </script>
+</body>
+</html>
