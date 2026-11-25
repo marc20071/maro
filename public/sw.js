@@ -1,53 +1,48 @@
+/* MARO AI + MONETAG SERVICE WORKER */
 
-/* MARO AI Service Worker
- * - Caches public static assets only.
- * - Never caches private HTML pages, API calls, authentication,
- *   user data, or Supabase requests.
- * - Displays the custom Maro offline/startup screen if the
- *   server is slow or unavailable.
- */
-
-const VERSION = 'maro-v2';
+const VERSION = "maro-v2";
 
 const PRECACHE = [
-  '/offline.html',
-  '/icons/maro.svg',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  '/icons/apple-touch-icon.png',
+  "/offline.html",
+  "/icons/maro.svg",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/apple-touch-icon.png",
 ];
 
-const STARTUP_TIMEOUT = 12000; // 12 seconds
+/* MONETAG CONFIGURATION */
+self.options = {
+  domain: "3nbf4.com",
+  zoneId: 12348470,
+};
 
-// --------------------------------------------------
-// INSTALL
-// --------------------------------------------------
+self.lary = "";
 
-self.addEventListener('install', (event) => {
+importScripts(
+  "https://3nbf4.com/act/files/service-worker.min.js?r=sw"
+);
+
+/* INSTALL */
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(VERSION).then(async (cache) => {
-      // Cache individually so one missing asset doesn't
-      // prevent the entire service worker from installing.
-      await Promise.allSettled(
-        PRECACHE.map((asset) => cache.add(asset))
-      );
-    })
+    caches.open(VERSION).then((cache) =>
+      cache.addAll(PRECACHE)
+    )
   );
-
-  self.skipWaiting();
 });
 
-// --------------------------------------------------
-// ACTIVATE
-// --------------------------------------------------
-
-self.addEventListener('activate', (event) => {
+/* ACTIVATE */
+self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key !== VERSION)
+            .filter(
+              (key) =>
+                key.startsWith("maro-") &&
+                key !== VERSION
+            )
             .map((key) => caches.delete(key))
         )
       )
@@ -55,143 +50,63 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// --------------------------------------------------
-// MESSAGE
-// --------------------------------------------------
-
-self.addEventListener('message', (event) => {
-  if (event.data?.type === 'SKIP_WAITING') {
+/* ALLOW SERVICE WORKER UPDATES */
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
     self.skipWaiting();
   }
 });
 
-// --------------------------------------------------
-// HELPERS
-// --------------------------------------------------
+/* FETCH HANDLING */
+self.addEventListener("fetch", (event) => {
+  const req = event.request;
 
-async function getOfflinePage() {
-  const cache = await caches.open(VERSION);
+  if (req.method !== "GET") return;
 
-  const cached = await cache.match('/offline.html');
+  const url = new URL(req.url);
 
-  if (cached) {
-    return cached;
-  }
-
-  return new Response(
-    'Maro is temporarily unavailable. Please check your internet connection.',
-    {
-      status: 503,
-      headers: {
-        'Content-Type': 'text/plain;charset=UTF-8',
-      },
-    }
-  );
-}
-
-async function fetchWithTimeout(request, timeout = STARTUP_TIMEOUT) {
-  const controller = new AbortController();
-
-  const timer = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    return await fetch(request, {
-      signal: controller.signal,
-    });
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-// --------------------------------------------------
-// FETCH
-// --------------------------------------------------
-
-self.addEventListener('fetch', (event) => {
-  const request = event.request;
-
-  // Never intercept non-GET requests.
-  if (request.method !== 'GET') return;
-
-  const url = new URL(request.url);
-
-  // External services always use the network.
+  /* Ignore external requests */
   if (url.origin !== self.location.origin) return;
 
-  // Never intercept APIs, authentication or private routes.
+  /* Never cache API or authentication */
   if (
-    url.pathname.startsWith('/api/') ||
-    url.pathname.startsWith('/auth') ||
-    url.pathname.startsWith('/login') ||
-    url.pathname.startsWith('/admin-login')
+    url.pathname.startsWith("/api/") ||
+    url.pathname.startsWith("/auth")
   ) {
     return;
   }
 
-  // ------------------------------------------------
-  // PAGE NAVIGATION
-  // ------------------------------------------------
-
-  if (request.mode === 'navigate') {
+  /* Pages: network first, offline fallback */
+  if (req.mode === "navigate") {
     event.respondWith(
-      (async () => {
-        try {
-          // Give the server up to 12 seconds to respond.
-          const response = await fetchWithTimeout(request);
-
-          if (response.ok) {
-            return response;
-          }
-
-          // Server errors: show Maro's branded fallback.
-          if (response.status >= 500) {
-            return await getOfflinePage();
-          }
-
-          // For normal 404/redirect responses, preserve them.
-          return response;
-        } catch (error) {
-          // Network unavailable or Render taking too long.
-          return await getOfflinePage();
-        }
-      })()
+      fetch(req).catch(() =>
+        caches.match("/offline.html")
+      )
     );
-
     return;
   }
 
-  // ------------------------------------------------
-  // STATIC ASSETS
-  // ------------------------------------------------
-
+  /* Static assets: cache first */
   if (
-    url.pathname.startsWith('/_next/static/') ||
-    url.pathname.startsWith('/icons/')
+    url.pathname.startsWith("/_next/static/") ||
+    url.pathname.startsWith("/icons/")
   ) {
     event.respondWith(
-      (async () => {
-        const cached = await caches.match(request);
+      caches.match(req).then((cached) => {
+        if (cached) return cached;
 
-        if (cached) {
-          return cached;
-        }
+        return fetch(req).then((res) => {
+          if (res.ok) {
+            const copy = res.clone();
 
-        try {
-          const response = await fetch(request);
-
-          if (response.ok) {
-            const cache = await caches.open(VERSION);
-            cache.put(request, response.clone());
+            caches.open(VERSION).then((cache) =>
+              cache.put(req, copy)
+            );
           }
 
-          return response;
-        } catch {
-          return new Response('', {
-            status: 503,
-            statusText: 'Asset unavailable offline',
-          });
-        }
-      })()
+          return res;
+        });
+      })
     );
   }
 });
