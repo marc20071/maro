@@ -49,7 +49,7 @@ export const metadata: Metadata = {
   },
 
   other: {
-    monetag: '17304554e6edd7014970ec67656f596c',
+    monetag: 'c8e74ae6ead447a698702cc796eec418',
   },
 };
 
@@ -67,6 +67,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
+      <head>
+        <meta
+          name="monetag"
+          content="c8e74ae6ead447a698702cc796eec418"
+        />
+      </head>
+
       <body>
         {children}
         <ServiceWorker />
