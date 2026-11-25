@@ -76,14 +76,7 @@ export default function RootLayout({
         />
 
         {/* Monetag advertising integration */}
-        <Script
-          id="monetag-advertising"
-          src="https://quge5.com/88/tag.min.js"
-          data-zone="315761"
-          strategy="afterInteractive"
-          data-cfasync="false"
-        />
-      </head>
+        
 
       <body>
         {children}
