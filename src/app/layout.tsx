@@ -1,5 +1,6 @@
 
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Bricolage_Grotesque, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import ServiceWorker from '@/components/ServiceWorker';
@@ -68,9 +69,19 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <head>
+        {/* Monetag website verification */}
         <meta
           name="monetag"
           content="c8e74ae6ead447a698702cc796eec418"
+        />
+
+        {/* Monetag advertising integration */}
+        <Script
+          id="monetag-advertising"
+          src="https://quge5.com/88/tag.min.js"
+          data-zone="315761"
+          strategy="afterInteractive"
+          data-cfasync="false"
         />
       </head>
 
