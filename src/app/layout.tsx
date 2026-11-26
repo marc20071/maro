@@ -1,5 +1,5 @@
-
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Bricolage_Grotesque, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import ServiceWorker from '@/components/ServiceWorker';
