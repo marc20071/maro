@@ -16,14 +16,7 @@ export default function AdSlot({ placement = 'default' }: AdSlotProps) {
       className="w-full flex justify-center overflow-hidden"
       data-ad-placement={placement}
     >
-      <Script
-        id={`maro-ad-${placement}`}
-        src="https://quge5.com/88/tag.min.js"
-        data-zone="315761"
-        async
-        data-cfasync="false"
-        strategy="afterInteractive"
-      />
+     
     </div>
   );
 }
