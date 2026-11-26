@@ -80,95 +80,205 @@ export default function RootLayout({
           content="qYPvRFyHCkzwqItYAul-sPsUPP3Ino476Er0fhX7hks"
         />
 
-        {/* Install MARO button styles */}
+        {/* Install banner styling */}
         <style>{`
-          #maro-install-button {
-            position: fixed;
-            right: 18px;
-            bottom: calc(20px + env(safe-area-inset-bottom));
-            z-index: 99999;
+          #maro-install-banner {
+            display: none;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 16px;
+            background: #111827;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            color: white;
+          }
+
+          #maro-install-banner-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+          }
+
+          #maro-install-icon {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 14px 20px;
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 16px;
-            background: linear-gradient(135deg, #7c3aed, #4f46e5);
-            color: white;
-            font-family: inherit;
+          }
+
+          #maro-install-message {
+            flex: 1;
+            min-width: 0;
+          }
+
+          #maro-install-title {
             font-size: 14px;
             font-weight: 700;
+          }
+
+          #maro-install-description {
+            font-size: 12px;
+            color: #a1a1aa;
+            margin-top: 3px;
+          }
+
+          #maro-install-action {
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 16px;
+            background: #7c3aed;
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
             cursor: pointer;
-            box-shadow: 0 8px 30px rgba(99,102,241,0.35);
-            transition: transform .2s, opacity .2s;
+            white-space: nowrap;
           }
 
-          #maro-install-button:hover {
-            transform: translateY(-2px);
+          #maro-install-action:hover {
+            background: #6d28d9;
           }
 
-          #maro-install-button:active {
-            transform: scale(.96);
+          #maro-install-close {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: #a1a1aa;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
 
-          #maro-install-button svg {
-            width: 20px;
-            height: 20px;
+          #maro-install-close:hover {
+            background: rgba(255,255,255,0.08);
+            color: white;
           }
 
           @media (max-width: 480px) {
-            #maro-install-button {
-              right: 14px;
-              bottom: calc(16px + env(safe-area-inset-bottom));
-              padding: 12px 16px;
+            #maro-install-banner {
+              padding: 10px 12px;
+            }
+
+            #maro-install-banner-content {
+              gap: 9px;
+            }
+
+            #maro-install-icon {
+              width: 36px;
+              height: 36px;
+              border-radius: 10px;
+            }
+
+            #maro-install-title {
               font-size: 13px;
+            }
+
+            #maro-install-description {
+              font-size: 11px;
+            }
+
+            #maro-install-action {
+              padding: 9px 12px;
+              font-size: 12px;
+            }
+
+            #maro-install-close {
+              width: 30px;
+              height: 30px;
             }
           }
         `}</style>
       </head>
 
       <body>
+        {/* Dismissible installation banner */}
+        <div id="maro-install-banner">
+          <div id="maro-install-banner-content">
+            <div id="maro-install-icon">
+              <svg
+                width="23"
+                height="23"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 3v12" />
+                <path d="m7 10 5 5 5-5" />
+                <path d="M5 19h14" />
+              </svg>
+            </div>
+
+            <div id="maro-install-message">
+              <div id="maro-install-title">
+                Install MARO AI
+              </div>
+
+              <div id="maro-install-description">
+                Get faster access from your home screen.
+              </div>
+            </div>
+
+            <button id="maro-install-action" type="button">
+              Install
+            </button>
+
+            <button
+              id="maro-install-close"
+              type="button"
+              aria-label="Dismiss install banner"
+              title="Close"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
         {children}
 
-        {/* Install MARO button */}
-        <button id="maro-install-button" type="button">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 3v12" />
-            <path d="m7 10 5 5 5-5" />
-            <path d="M5 19h14" />
-          </svg>
-
-          <span id="maro-install-text">Install MARO</span>
-        </button>
-
-        {/* PWA installation logic */}
+        {/* Installation functionality */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (() => {
+                const banner = document.getElementById('maro-install-banner');
+                const installButton = document.getElementById('maro-install-action');
+                const closeButton = document.getElementById('maro-install-close');
+
+                if (!banner || !installButton || !closeButton) return;
+
+                const STORAGE_KEY = 'maro-install-banner-dismissed';
+
                 let deferredPrompt = null;
 
-                const button = document.getElementById('maro-install-button');
-                const text = document.getElementById('maro-install-text');
-
-                if (!button || !text) return;
-
-                const isStandalone =
+                const isInstalled =
                   window.matchMedia('(display-mode: standalone)').matches ||
                   window.navigator.standalone === true;
 
-                if (isStandalone) {
-                  button.style.display = 'none';
+                if (isInstalled) {
+                  banner.style.display = 'none';
                   return;
                 }
+
+                try {
+                  if (localStorage.getItem(STORAGE_KEY) === 'true') {
+                    banner.style.display = 'none';
+                    return;
+                  }
+                } catch (e) {}
+
+                banner.style.display = 'block';
 
                 window.addEventListener('beforeinstallprompt', (event) => {
                   event.preventDefault();
@@ -176,18 +286,30 @@ export default function RootLayout({
                 });
 
                 window.addEventListener('appinstalled', () => {
-                  button.style.display = 'none';
+                  banner.style.display = 'none';
                   deferredPrompt = null;
+
+                  try {
+                    localStorage.setItem(STORAGE_KEY, 'true');
+                  } catch (e) {}
                 });
 
-                button.addEventListener('click', async () => {
+                closeButton.addEventListener('click', () => {
+                  banner.style.display = 'none';
+
+                  try {
+                    localStorage.setItem(STORAGE_KEY, 'true');
+                  } catch (e) {}
+                });
+
+                installButton.addEventListener('click', async () => {
                   if (deferredPrompt) {
                     deferredPrompt.prompt();
 
-                    const result = await deferredPrompt.userChoice;
+                    const choice = await deferredPrompt.userChoice;
 
-                    if (result.outcome === 'accepted') {
-                      button.style.display = 'none';
+                    if (choice.outcome === 'accepted') {
+                      banner.style.display = 'none';
                     }
 
                     deferredPrompt = null;
@@ -199,15 +321,15 @@ export default function RootLayout({
 
                   if (isIOS) {
                     alert(
-                      'To install MARO:\\\\n\\\\n' +
+                      'Install MARO AI:\\\\n\\\\n' +
                       '1. Tap the Share button in Safari.\\\\n' +
                       '2. Select "Add to Home Screen".\\\\n' +
                       '3. Tap Add.'
                     );
                   } else {
                     alert(
-                      'To install MARO:\\\\n\\\\n' +
-                      'Open your browser menu and select "Install MARO", "Install app", or "Add to Home Screen".'
+                      'To install MARO AI:\\\\n\\\\n' +
+                      'Open your browser menu and select "Install app" or "Add to Home Screen".'
                     );
                   }
                 });
