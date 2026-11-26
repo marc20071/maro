@@ -4,31 +4,74 @@ import { Bricolage_Grotesque, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import ServiceWorker from '@/components/ServiceWorker';
 
+const SITE_URL = 'https://maroai.vercel.app';
+const SITE_NAME = 'MARO AI';
+
 const sans = Bricolage_Grotesque({
   subsets: ['latin'],
   variable: '--font-sans',
+  display: 'swap',
 });
 
 const mono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+
   title: {
-    default: 'MARO AI',
-    template: '%s · MARO AI',
+    default: 'MARO AI - Your Intelligent AI Assistant',
+    template: '%s | MARO AI',
   },
 
   description:
-    'One AI assistant for everyday questions, coding, health information and learning.',
+    'Meet MARO AI, your intelligent AI assistant for everyday questions, coding, learning, productivity and reliable health information.',
 
-  applicationName: 'MARO AI',
+  applicationName: SITE_NAME,
+
+  generator: 'Next.js',
+
+  referrer: 'origin-when-cross-origin',
+
+  alternates: {
+    canonical: '/',
+  },
+
+  keywords: [
+    'MARO AI',
+    'MaroAI',
+    'AI assistant',
+    'artificial intelligence',
+    'AI chatbot',
+    'coding assistant',
+    'learning assistant',
+    'productivity AI',
+    'online AI assistant',
+  ],
+
+  authors: [
+    {
+      name: 'MARO AI',
+      url: SITE_URL,
+    },
+  ],
+
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+
+  category: 'technology',
 
   manifest: '/manifest.webmanifest',
 
   icons: {
     icon: [
+      {
+        url: '/favicon.ico',
+        sizes: 'any',
+      },
       {
         url: '/icons/maro.svg',
         type: 'image/svg+xml',
@@ -39,13 +82,60 @@ export const metadata: Metadata = {
         type: 'image/png',
       },
     ],
-    apple: '/icons/apple-touch-icon.png',
+
+    shortcut: '/favicon.ico',
+
+    apple: [
+      {
+        url: '/icons/apple-touch-icon.png',
+        sizes: '180x180',
+        type: 'image/png',
+      },
+    ],
   },
 
   appleWebApp: {
     capable: true,
-    title: 'MARO AI',
+    title: SITE_NAME,
     statusBarStyle: 'black-translucent',
+  },
+
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: 'MARO AI - Your Intelligent AI Assistant',
+    description:
+      'One intelligent AI assistant for everyday questions, coding, learning and productivity.',
+    images: [
+      {
+        url: '/icons/icon-512.png',
+        width: 512,
+        height: 512,
+        alt: 'MARO AI Logo',
+      },
+    ],
+  },
+
+  twitter: {
+    card: 'summary_large_image',
+    title: 'MARO AI - Your Intelligent AI Assistant',
+    description:
+      'Discover MARO AI, your intelligent assistant for coding, learning and everyday questions.',
+    images: ['/icons/icon-512.png'],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
   },
 
   other: {
@@ -62,13 +152,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <head>
-        {/* Monetag website verification */}
+        {/* Monetag verification */}
         <meta
           name="monetag"
           content="c8e74ae6ead447a698702cc796eec418"
@@ -79,6 +169,9 @@ export default function RootLayout({
           name="google-site-verification"
           content="qYPvRFyHCkzwqItYAul-sPsUPP3Ino476Er0fhX7hks"
         />
+
+        {/* Website identity */}
+        <meta name="application-name" content={SITE_NAME} />
 
         {/* Install banner styling */}
         <style>{`
@@ -200,7 +293,7 @@ export default function RootLayout({
       </head>
 
       <body>
-        {/* Dismissible installation banner */}
+        {/* MARO AI installation banner */}
         <div id="maro-install-banner">
           <div id="maro-install-banner-content">
             <div id="maro-install-icon">
@@ -213,6 +306,7 @@ export default function RootLayout({
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                aria-hidden="true"
               >
                 <path d="M12 3v12" />
                 <path d="m7 10 5 5 5-5" />
@@ -247,7 +341,7 @@ export default function RootLayout({
 
         {children}
 
-        {/* Installation functionality */}
+        {/* PWA installation functionality */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -321,14 +415,14 @@ export default function RootLayout({
 
                   if (isIOS) {
                     alert(
-                      'Install MARO AI:\\\\n\\\\n' +
-                      '1. Tap the Share button in Safari.\\\\n' +
-                      '2. Select "Add to Home Screen".\\\\n' +
+                      'Install MARO AI:\\n\\n' +
+                      '1. Tap the Share button in Safari.\\n' +
+                      '2. Select "Add to Home Screen".\\n' +
                       '3. Tap Add.'
                     );
                   } else {
                     alert(
-                      'To install MARO AI:\\\\n\\\\n' +
+                      'To install MARO AI:\\n\\n' +
                       'Open your browser menu and select "Install app" or "Add to Home Screen".'
                     );
                   }
