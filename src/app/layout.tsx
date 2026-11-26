@@ -6,6 +6,9 @@ import ServiceWorker from '@/components/ServiceWorker';
 
 const SITE_URL = 'https://maroai.vercel.app';
 const SITE_NAME = 'MARO AI';
+const MONETAG_ID = 'c8e74ae6ead447a698702cc796eec418';
+const GOOGLE_VERIFICATION =
+  'qYPvRFyHCkzwqItYAul-sPsUPP3Ino476Er0fhX7hks';
 
 const sans = Bricolage_Grotesque({
   subsets: ['latin'],
@@ -31,9 +34,7 @@ export const metadata: Metadata = {
     'Meet MARO AI, your intelligent AI assistant for everyday questions, coding, learning, productivity and reliable health information.',
 
   applicationName: SITE_NAME,
-
   generator: 'Next.js',
-
   referrer: 'origin-when-cross-origin',
 
   alternates: {
@@ -54,24 +55,20 @@ export const metadata: Metadata = {
 
   authors: [
     {
-      name: 'MARO AI',
+      name: SITE_NAME,
       url: SITE_URL,
     },
   ],
 
   creator: SITE_NAME,
   publisher: SITE_NAME,
-
   category: 'technology',
 
   manifest: '/manifest.webmanifest',
 
   icons: {
     icon: [
-      {
-        url: '/favicon.ico',
-        sizes: 'any',
-      },
+      { url: '/favicon.ico', sizes: 'any' },
       {
         url: '/icons/maro.svg',
         type: 'image/svg+xml',
@@ -139,7 +136,7 @@ export const metadata: Metadata = {
   },
 
   other: {
-    monetag: 'c8e74ae6ead447a698702cc796eec418',
+    monetag: MONETAG_ID,
   },
 };
 
@@ -159,21 +156,18 @@ export default function RootLayout({
     <html lang="en" className={`${sans.variable} ${mono.variable}`}>
       <head>
         {/* Monetag verification */}
-        <meta
-          name="monetag"
-          content="c8e74ae6ead447a698702cc796eec418"
-        />
+        <meta name="monetag" content={MONETAG_ID} />
 
         {/* Google Search Console verification */}
         <meta
           name="google-site-verification"
-          content="qYPvRFyHCkzwqItYAul-sPsUPP3Ino476Er0fhX7hks"
+          content={GOOGLE_VERIFICATION}
         />
 
         {/* Website identity */}
         <meta name="application-name" content={SITE_NAME} />
 
-        {/* Install banner styling */}
+        {/* Installation banner styling */}
         <style>{`
           #maro-install-banner {
             display: none;
@@ -183,6 +177,7 @@ export default function RootLayout({
             background: #111827;
             border-bottom: 1px solid rgba(255,255,255,0.08);
             color: white;
+            z-index: 9999;
           }
 
           #maro-install-banner-content {
@@ -324,7 +319,10 @@ export default function RootLayout({
               </div>
             </div>
 
-            <button id="maro-install-action" type="button">
+            <button
+              id="maro-install-action"
+              type="button"
+            >
               Install
             </button>
 
@@ -356,8 +354,11 @@ export default function RootLayout({
 
                 let deferredPrompt = null;
 
+                const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
                 const isInstalled =
                   window.matchMedia('(display-mode: standalone)').matches ||
+                  window.matchMedia('(display-mode: fullscreen)').matches ||
                   window.navigator.standalone === true;
 
                 if (isInstalled) {
@@ -367,16 +368,21 @@ export default function RootLayout({
 
                 try {
                   if (localStorage.getItem(STORAGE_KEY) === 'true') {
-                    banner.style.display = 'none';
                     return;
                   }
-                } catch (e) {}
+                } catch (error) {}
+
+                const isInstallSupported =
+                  'onbeforeinstallprompt' in window || isIOS;
+
+                if (!isInstallSupported) return;
 
                 banner.style.display = 'block';
 
                 window.addEventListener('beforeinstallprompt', (event) => {
                   event.preventDefault();
                   deferredPrompt = event;
+                  banner.style.display = 'block';
                 });
 
                 window.addEventListener('appinstalled', () => {
@@ -385,7 +391,7 @@ export default function RootLayout({
 
                   try {
                     localStorage.setItem(STORAGE_KEY, 'true');
-                  } catch (e) {}
+                  } catch (error) {}
                 });
 
                 closeButton.addEventListener('click', () => {
@@ -393,25 +399,26 @@ export default function RootLayout({
 
                   try {
                     localStorage.setItem(STORAGE_KEY, 'true');
-                  } catch (e) {}
+                  } catch (error) {}
                 });
 
                 installButton.addEventListener('click', async () => {
                   if (deferredPrompt) {
-                    deferredPrompt.prompt();
+                    try {
+                      await deferredPrompt.prompt();
 
-                    const choice = await deferredPrompt.userChoice;
+                      const choice = await deferredPrompt.userChoice;
 
-                    if (choice.outcome === 'accepted') {
-                      banner.style.display = 'none';
+                      if (choice.outcome === 'accepted') {
+                        banner.style.display = 'none';
+                      }
+                    } catch (error) {
+                      console.error('Installation failed:', error);
                     }
 
                     deferredPrompt = null;
                     return;
                   }
-
-                  const isIOS =
-                    /iphone|ipad|ipod/i.test(navigator.userAgent);
 
                   if (isIOS) {
                     alert(
