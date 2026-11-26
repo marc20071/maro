@@ -2,7 +2,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://maro-5k2u.onrender.com";
+  const baseUrl = "https://maroai.vercel.app";
 
   return [
     {
