@@ -1,54 +1,54 @@
 
-import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from '@supabase/ssr';
+import { NextResponse, type NextRequest } from 'next/server';
 
 const PUBLIC_ROUTES = [
-  "/",
-  "/coding",
-  "/medicine",
-  "/learning",
-  "/login",
-  "/admin-login",
-  "/auth",
-  "/offline.html",
-  "/manifest.webmanifest",
-  "/sw.js",
-  "/api/chat",
+  '/',
+  '/about',
+  '/contact',
+  '/privacy',
+  '/terms',
+  '/coding',
+  '/medicine',
+  '/learning',
+  '/admin-login',
+  '/auth',
+  '/offline.html',
+  '/manifest.webmanifest',
+  '/sw.js',
+  '/api/chat',
 ];
 
 const PUBLIC_FILES = [
-  "/robots.txt",
-  "/sitemap.xml",
-  "/favicon.ico",
-  "/manifest.webmanifest",
-  "/offline.html",
-  "/sw.js",
+  '/robots.txt',
+  '/sitemap.xml',
+  '/favicon.ico',
+  '/manifest.webmanifest',
+  '/offline.html',
+  '/sw.js',
 ];
 
 const PUBLIC_DIRECTORIES = [
-  "/icons",
-  "/images",
-  "/assets",
+  '/icons',
+  '/images',
+  '/assets',
 ];
 
-// Files located in public/ should be served without authentication.
 function isPublicFile(path: string): boolean {
-  // Explicitly public files
   if (PUBLIC_FILES.includes(path)) {
     return true;
   }
 
-  // Public static directories
   if (
     PUBLIC_DIRECTORIES.some(
       (directory) =>
-        path === directory || path.startsWith(directory + "/")
+        path === directory || path.startsWith(directory + '/')
     )
   ) {
     return true;
   }
 
-  // SEO verification files and common static file extensions
+  // Allow static assets and SEO verification files.
   if (
     /\.(txt|xml|html|htm|json|webmanifest|css|js|map|png|svg|jpg|jpeg|gif|webp|ico|woff|woff2|ttf|otf|pdf)$/i.test(
       path
@@ -64,25 +64,26 @@ function isPublicRoute(path: string): boolean {
   return PUBLIC_ROUTES.some(
     (publicPath) =>
       path === publicPath ||
-      (publicPath !== "/" && path.startsWith(publicPath + "/"))
+      (publicPath !== '/' && path.startsWith(publicPath + '/'))
   );
 }
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  // 1. Allow static/public files without authentication.
-  // No Supabase request is needed for these.
+  // 1. Public static files: no authentication required.
   if (isPublicFile(path)) {
     return NextResponse.next();
   }
 
-  // 2. Allow designated public routes.
-  if (isPublicRoute(path)) {
+  // 2. Public pages and APIs: no authentication required.
+  // The login page is handled separately so logged-in users
+  // can be redirected away from it.
+  if (path !== '/login' && isPublicRoute(path)) {
     return NextResponse.next();
   }
 
-  // 3. Supabase authentication for protected routes.
+  // 3. Initialize Supabase authentication.
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -95,19 +96,19 @@ export async function middleware(request: NextRequest) {
         },
 
         setAll(
-          list: {
+          cookiesToSet: {
             name: string;
             value: string;
             options?: Parameters<typeof response.cookies.set>[2];
           }[]
         ) {
-          list.forEach(({ name, value }) => {
+          cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value);
           });
 
           response = NextResponse.next({ request });
 
-          list.forEach(({ name, value, options }) => {
+          cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options);
           });
         },
@@ -119,30 +120,34 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // 4. Protect API endpoints.
-  if (!user && path.startsWith("/api/")) {
-    return NextResponse.json(
-      { error: "Not signed in." },
-      { status: 401 }
-    );
-  }
-
-  // 5. Protect pages from unauthenticated visitors.
-  if (!user) {
+  // 4. Logged-in users should not stay on the login page.
+  if (user && path === '/login') {
     const url = request.nextUrl.clone();
-
-    url.pathname = "/login";
-    url.search = "";
+    url.pathname = '/';
+    url.search = '';
 
     return NextResponse.redirect(url);
   }
 
-  // 6. Redirect logged-in users away from login.
-  if (user && path === "/login") {
+  // 5. Allow visitors to access the login page.
+  if (path === '/login') {
+    return response;
+  }
+
+  // 6. Protect private API endpoints.
+  if (!user && path.startsWith('/api/')) {
+    return NextResponse.json(
+      { error: 'Not signed in.' },
+      { status: 401 }
+    );
+  }
+
+  // 7. Protect all remaining private pages.
+  if (!user) {
     const url = request.nextUrl.clone();
 
-    url.pathname = "/";
-    url.search = "";
+    url.pathname = '/login';
+    url.search = '';
 
     return NextResponse.redirect(url);
   }
@@ -152,6 +157,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };
