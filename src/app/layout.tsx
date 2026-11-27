@@ -66,10 +66,13 @@ export const metadata: Metadata = {
 
   manifest: '/manifest.webmanifest',
 
-  // Use only icons that actually exist in public/icons.
-  // No favicon.ico is referenced anywhere.
+  // Website favicon and application icons.
   icons: {
     icon: [
+      {
+        url: '/icons/maro.svg',
+        type: 'image/svg+xml',
+      },
       {
         url: '/icons/icon-192.png',
         sizes: '192x192',
@@ -79,10 +82,6 @@ export const metadata: Metadata = {
         url: '/icons/icon-512.png',
         sizes: '512x512',
         type: 'image/png',
-      },
-      {
-        url: '/icons/maro.svg',
-        type: 'image/svg+xml',
       },
     ],
 
@@ -170,6 +169,20 @@ export default function RootLayout({
 
         {/* Website identity */}
         <meta name="application-name" content={SITE_NAME} />
+
+        {/* Organization structured data for Google */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: SITE_NAME,
+              url: SITE_URL,
+              logo: `${SITE_URL}/icons/icon-512.png`,
+            }),
+          }}
+        />
 
         {/* Installation banner styling */}
         <style>{`
