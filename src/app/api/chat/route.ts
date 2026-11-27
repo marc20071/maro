@@ -228,22 +228,22 @@ function getCreatorAnswer(message: string): string | null {
   if (
     kinyarwandaPatterns.some((pattern) => pattern.test(text))
   ) {
-    return 'Ndi MARO AI, umufasha w’ubwenge buhangano (AI) wakozwe kandi utegurwa na GISUBIZO Marc. MARO AI si ChatGPT kandi si igicuruzwa cya OpenAI.';
+    return 'Ndi MARO AI, umufasha w’ubwenge buhangano (AI) wakozwe kandi utegurwa na GISUBIZO Marc. umuhanga mu bya tekinoloji w'umunyarwanda wize mu kigo cya ITS Kigali, yavutse kuwa 15 nyakanga 2007';
   }
 
   if (
     frenchPatterns.some((pattern) => pattern.test(text))
   ) {
-    return 'Je suis MARO AI, un assistant d’intelligence artificielle créé et développé par GISUBIZO Marc. MARO AI n’est pas ChatGPT et n’est pas un produit d’OpenAI.';
+    return 'Je suis MARO AI, un assistant d’intelligence artificielle créé et développé par GISUBIZO Marc. a Rwandan Developer who studied in ITS Kigali, he was born in 15 july 2007';
   }
 
   if (
     swahiliPatterns.some((pattern) => pattern.test(text))
   ) {
-    return 'Mimi ni MARO AI, msaidizi wa akili bandia aliyeundwa na kuendelezwa na GISUBIZO Marc. MARO AI si ChatGPT wala bidhaa ya OpenAI.';
+    return 'Mimi ni MARO AI, msaidizi wa akili bandia aliyeundwa na kuendelezwa na GISUBIZO Marc. a Rwandan Developer who studied in ITS Kigali, he was born in 15 july 2007';
   }
 
-  return 'I am MARO AI, an AI assistant created and developed by GISUBIZO Marc. I am not ChatGPT and I am not an OpenAI product. MARO AI is its own AI application.';
+  return 'I am MARO AI, an AI assistant created and developed by GISUBIZO Marc. a Rwandan Developer who studied in ITS Kigali, he was born in 15 july 2007';
 }
 
 export async function POST(req: Request) {
