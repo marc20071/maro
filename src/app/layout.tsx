@@ -1,5 +1,5 @@
+
 import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
 import { Bricolage_Grotesque, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import ServiceWorker from '@/components/ServiceWorker';
@@ -66,21 +66,25 @@ export const metadata: Metadata = {
 
   manifest: '/manifest.webmanifest',
 
+  // Use only icons that actually exist in public/icons.
+  // No favicon.ico is referenced anywhere.
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      {
-        url: '/icons/maro.svg',
-        type: 'image/svg+xml',
-      },
       {
         url: '/icons/icon-192.png',
         sizes: '192x192',
         type: 'image/png',
       },
+      {
+        url: '/icons/icon-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+      },
+      {
+        url: '/icons/maro.svg',
+        type: 'image/svg+xml',
+      },
     ],
-
-    shortcut: '/favicon.ico',
 
     apple: [
       {
