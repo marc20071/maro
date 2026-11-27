@@ -24,7 +24,7 @@ export default function ContactPage() {
         </p>
 
         <p className="mb-2 text-gray-400">
-          Website: maro-5k2u.onrender.com
+          Website: maroai.vercel.app
         </p>
 
         <p className="text-gray-400">
