@@ -360,7 +360,7 @@ async function callChat(
         body: JSON.stringify({
           model,
           messages,
-          temperature: 0.7,
+          temperature: 0.2,
           max_completion_tokens: 4096,
           ...(stream ? { stream: true } : {}),
         }),
