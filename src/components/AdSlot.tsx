@@ -24,6 +24,26 @@ export default function AdSlot({ placement = 'default' }: AdSlotProps) {
         data-zone="12351795"
         data-cfasync="false"
       />
+
+      {/* Monetag Vignette Banner */}
+      {placement === 'default' && (
+        <Script
+          id="monetag-vignette"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(s) {
+                s.dataset.zone = '12366975';
+                s.src = 'https://n6wxm.com/vignette.min.js';
+              })(
+                document.documentElement.appendChild(
+                  document.createElement('script')
+                )
+              );
+            `,
+          }}
+        />
+      )}
     </div>
   );
 }
